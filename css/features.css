@@ -1,0 +1,403 @@
+/* ============================================
+   About / 課題 × 解決 セクション専用 CSS
+   ============================================ */
+
+/* セクションタイトル */
+#about .container {
+  width: min(var(--w-container), 92vw);
+}
+
+#about h2 {
+  font-size: var(--fz-32);
+  font-weight: 900;
+  margin-bottom: var(--space-24);
+}
+
+/* --------------------------------------------
+   3カラムレイアウト（課題｜アイコン｜解決）
+   -------------------------------------------- */
+.feature-pair {
+  display: flex;
+  gap: 32px;
+  padding: 24px;
+  margin-bottom: 24px;
+  border-radius: var(--radius-l);
+  border: 1px solid var(--line);
+  background: #fff;
+  box-shadow: var(--shadow-s);
+}
+
+/* 左：課題 */
+.feature-problem {
+  flex: 1.4;
+  padding-right: var(--space-16);
+  border-right: 1px dashed var(--line);
+}
+
+/* 中央：イラスト */
+.feature-illust {
+  flex: 0 0 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+}
+
+.feature-illust img {
+  max-width: 120px;
+  height: auto;
+}
+
+/* 右：解決 */
+.feature-solution {
+  flex: 1.4;
+  padding-left: var(--space-16);
+}
+
+/* --------------------------------------------
+   テキスト調整
+   -------------------------------------------- */
+
+/* H3（課題・解決） */
+#about h3,
+.feature-problem h3,
+.feature-solution h3 {
+  font-size: var(--fz-20);
+  font-weight: 700;
+  margin: 0 0 6px;
+}
+
+/* 課題タイトル強調 */
+.feature-problem h3 {
+  color: #b42318;
+}
+
+/* 解決タイトルはブランドカラー */
+.feature-solution h3 {
+  color: var(--brand);
+}
+
+/* 本文 */
+#about p,
+.feature-problem p,
+.feature-solution p {
+  margin: 0;
+  font-size: var(--fz-16);
+  color: var(--ink-2);
+  line-height: 1.9;
+  max-width: 32em; /* 読みやすい行幅に制御 */
+}
+
+/* --------------------------------------------
+   スマホ縦積み
+   -------------------------------------------- */
+@media (max-width: 768px) {
+  .feature-pair {
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px 16px;
+  }
+
+  .feature-problem {
+    border-right: none;
+    border-bottom: 1px dashed var(--line);
+    padding-right: 0;
+    padding-bottom: var(--space-12);
+    margin-bottom: var(--space-8);
+  }
+
+  .feature-illust {
+    border-bottom: 1px dashed var(--line);
+    padding: 12px 0;
+    margin-bottom: var(--space-8);
+  }
+
+  .feature-solution {
+    padding-left: 0;
+  }
+
+  .feature-illust img {
+    max-width: 96px;
+  }
+}
+
+/* ============================================
+   Process / ご支援の進め方 セクション
+   ============================================ */
+
+/* 設計ブロックの ol */
+.process-list {
+  margin-bottom: 32px;
+  padding-left: 0;
+}
+
+.process-single {
+  list-style: none;
+  margin-bottom: 24px;
+}
+
+/* 設計 / 実行 / 可視化 のカード共通デザイン（背景色統一） */
+.process-card,
+.process-single {
+  background: rgba(235, 255, 245, 0.7) !important;
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: none;
+}
+
+/* 実行 ＋ 可視化・学習 の2カラム */
+.process-row {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.process-card {
+  flex: 1;
+}
+
+/* カード内の画像 */
+.process-step-image {
+  margin-top: 16px;
+  text-align: center;
+}
+
+.process-step-image img {
+  width: 100%;
+  max-width: 480px;
+  height: auto;
+  border-radius: 8px;
+  display: block;
+}
+
+/* Process セクションの本文は横幅制限を解除 */
+#process p {
+  max-width: none !important;
+}
+
+/* スマホでは縦並び */
+@media (max-width: 768px) {
+  .process-row {
+    flex-direction: column;
+    gap: 20px;
+  }
+}
+
+#about-title.section-title-with-line {
+  width: 100%;
+}
+
+
+
+
+
+
+/* ============================================
+   RESULTS / 事例スライダー
+   ============================================ */
+
+/* セクション全体 */
+#results {
+  margin-top: 80px;
+}
+
+/* ---------- スライダー本体 ---------- */
+.case-slider {
+  position: relative;
+  margin-top: 32px;
+  padding: 32px 0 24px;
+}
+
+/* 左右ボタン */
+.case-slider-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(15, 23, 42, 0.25);
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  transition: 0.25s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.18);
+}
+.case-slider-arrow:hover {
+  background: rgba(15, 23, 42, 0.45);
+}
+.case-slider-arrow--prev { left: 4%; }
+.case-slider-arrow--next { right: 4%; }
+
+/* スマホでは少し下に寄せる */
+@media (max-width: 768px){
+  .case-slider-arrow {
+    width: 36px;
+    height: 36px;
+    top: auto;
+    bottom: 0;
+    transform: translateY(60%);
+  }
+}
+
+/* ---------- ビューポート（カード枠） ---------- */
+.case-slider-viewport {
+  overflow: hidden;
+  width: 100%;
+}
+
+/* カードを横一列に並べつつ、中央カードがど真ん中になるようパディング */
+.case-slider-track {
+  display: flex;
+  gap: 28px;
+  padding: 0 5%;          /* ★ ここを 10% に変更（左右10%ずつ） */
+  transition: transform 0.6s cubic-bezier(.33,.02,.16,.99);
+}
+
+/* ---------- カード ---------- */
+.case-card {
+  position: relative;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  padding: 24px 32px 20px;
+  /* ★ 横長カード＋中央合わせ：幅80%に変更 */
+  flex: 0 0 90%;
+  max-width: 90%;
+  opacity: 0.45;
+  transform: scale(0.9);
+  transform-origin: center;
+  transition:
+    transform 0.45s cubic-bezier(.33,.02,.16,.99),
+    opacity 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+/* 中央カード（アクティブ）は一回り大きく・はっきり */
+.case-card.is-active {
+  opacity: 1;
+  transform: scale(0.96);
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.2);
+}
+
+/* スマホでは1枚表示にして見やすさ優先 */
+@media (max-width: 768px){
+  .case-slider-track {
+    padding: 0;
+    gap: 20px;
+  }
+  .case-card {
+    flex: 0 0 100%;
+    max-width: 100%;
+    padding: 20px 18px 18px;
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ---------- カード内の要素 ---------- */
+
+/* 事例バッジ（タイトルと被らないよう余白マシ） */
+.case-badge {
+  position: absolute;
+  top: 14px;
+  left: 24px;
+  background: #b91c1c;
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* 見出し：バッジとの距離をしっかりとる */
+.case-card-header {
+  margin-top: 26px;   /* ← 10px → 26px に */
+  margin-bottom: 8px;
+}
+
+.case-title {
+  font-size: 21px;
+  font-weight: 800;
+  margin: 0 0 8px;
+  line-height: 1.35;
+}
+
+/* クライアント／商材：2カラムレイアウト */
+.case-meta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 24px;
+  margin: 0 0 4px;
+}
+.case-meta-item dt {
+  font-size: 12px;
+  color: var(--ink-2);
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+.case-meta-item dd {
+  margin: 0;
+  font-size: 14px;
+  color: var(--ink);
+  font-weight: 500;
+}
+
+/* 本文系（高さを抑えるため余白控えめ） */
+.case-section {
+  margin-top: 8px;
+}
+.case-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--brand);
+  margin-bottom: 2px;
+}
+.case-body {
+  font-size: 14px;
+  color: var(--ink-2);
+  line-height: 1.65;
+  margin: 0 0 4px;
+}
+
+/* 成果ブロックだけ背景色付きで目立たせる */
+.case-section--result {
+  margin-top: 12px;
+}
+.case-section--result .case-result {
+  background: #fff5ec;
+  border-radius: 10px;
+  padding: 10px 12px;
+  border-left: 4px solid #f97316;
+}
+.case-section--result .case-result .case-body {
+  margin-bottom: 0;
+}
+
+/* ---------- 下ドットインジケーター ---------- */
+.case-slider-dots {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+.case-slider-dots button {
+  width: 8px;
+  height: 8px;
+  background: #d0d4da;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  transition: 0.25s;
+}
+.case-slider-dots button.is-active {
+  background: var(--brand);
+  width: 20px;
+}
+

@@ -305,6 +305,7 @@ console.log("✅ app.js is loaded successfully.");
     setupActiveNav();
     setupForm();
     setupFAQ();
+    setupCaseSlider();   // ← これを追加
   }
 
   if (document.readyState === 'loading') {
@@ -313,3 +314,228 @@ console.log("✅ app.js is loaded successfully.");
     init();
   }
 })();
+
+
+  /* -----------------------------
+   * Case slider (実績スライダー)
+   * 左右にクローンを置いて無限ループ＋両端も隣が見える
+   * ----------------------------- */
+  function setupCaseSlider() {
+    const slider = document.querySelector(".case-slider");
+    if (!slider) return;
+
+    const track = slider.querySelector(".case-slider-track");
+    let originalCards = Array.from(slider.querySelectorAll(".case-card"));
+    const prevBtn = slider.querySelector(".case-slider-arrow--prev");
+    const nextBtn = slider.querySelector(".case-slider-arrow--next");
+    let dotsContainer = slider.querySelector(".case-slider-dots");
+
+    if (!track || originalCards.length === 0) return;
+    const realCount = originalCards.length;
+    if (realCount === 1) return; // 1枚だけならスライダー不要
+
+    // --- クローンを前後に追加（両端でも隣が見えるように） ---
+    const firstClone = originalCards[0].cloneNode(true);
+    const lastClone = originalCards[realCount - 1].cloneNode(true);
+    firstClone.classList.add("case-card--clone");
+    lastClone.classList.add("case-card--clone");
+    firstClone.classList.remove("is-active");
+    lastClone.classList.remove("is-active");
+
+    track.insertBefore(lastClone, originalCards[0]); // 先頭にラストのコピー
+    track.appendChild(firstClone);                   // 末尾に最初のコピー
+
+    const slides = Array.from(track.querySelectorAll(".case-card")); // クローン含む配列
+    const totalSlides = slides.length; // = realCount + 2
+
+    // ドットコンテナが無ければ作る
+    if (!dotsContainer) {
+      dotsContainer = document.createElement("div");
+      dotsContainer.className = "case-slider-dots";
+      slider.appendChild(dotsContainer);
+    }
+
+    let index = 1; // slides上の現在位置（1〜realCount）を基本とし、0とrealCount+1はクローン
+    let slideWidth = 0;
+    let resizeTimer = null;
+
+    // 1ステップ分の移動幅（カード＋gap）を計算
+    function calcSlideWidth() {
+      if (slides.length < 3) {
+        slideWidth = slides[0].getBoundingClientRect().width;
+        return;
+      }
+
+      // is-active じゃないカード同士のペアを探して、その距離を使う
+      for (let i = 0; i < slides.length - 1; i++) {
+        const a = slides[i];
+        const b = slides[i + 1];
+        if (!a.classList.contains("is-active") && !b.classList.contains("is-active")) {
+          const r1 = a.getBoundingClientRect();
+          const r2 = b.getBoundingClientRect();
+          slideWidth = r2.left - r1.left; // 左端の差分 = カード幅 + gap
+          return;
+        }
+      }
+
+      // 念のためのフォールバック（全部 is-active だった場合）
+      const r1 = slides[1].getBoundingClientRect();
+      const r2 = slides[2].getBoundingClientRect();
+      slideWidth = r2.left - r1.left;
+    }
+
+
+    // ドット生成（実スライド分だけ）
+    const dots = originalCards.map((_, idx) => {
+      const dot = document.createElement("button");
+      dot.type = "button";
+      dotsContainer.appendChild(dot);
+      dot.addEventListener("click", () => {
+        goToRealIndex(idx);
+      });
+      return dot;
+    });
+
+    // slides上の index から「実スライド何番目か」を求める
+    function getLogicalIndex() {
+      // index: 0      1        2 ... realCount   realCount+1
+      // slide: lastC  card1    card2 ... cardN   firstC
+      // logical: N-1  0        1   ... N-1       0
+      if (index === 0) return realCount - 1;
+      if (index === realCount + 1) return 0;
+      return index - 1;
+    }
+
+    function updateActive() {
+      const logical = getLogicalIndex();
+      originalCards.forEach((card, idx) => {
+        card.classList.toggle("is-active", idx === logical);
+      });
+      dots.forEach((dot, idx) => {
+        dot.classList.toggle("is-active", idx === logical);
+      });
+    }
+
+    function updateTransform(skipAnimation) {
+      const x = -index * slideWidth;
+      if (skipAnimation) {
+        const prevTransition = track.style.transition;
+        track.style.transition = "none";
+        track.style.transform = `translateX(${x}px)`;
+        // 強制リフロー
+        void track.offsetHeight;
+        track.style.transition = prevTransition || "";
+      } else {
+        track.style.transform = `translateX(${x}px)`;
+      }
+    }
+
+    // 実スライドのインデックス(0〜realCount-1)を指定して移動
+    function goToRealIndex(realIdx, opts = {}) {
+      const { skipAnimation = false } = opts;
+      let target = realIdx;
+      // 正規化
+      if (target < 0) target = realCount - 1;
+      if (target >= realCount) target = 0;
+
+      index = target + 1; // slides上では +1 した位置
+      updateTransform(skipAnimation);
+      updateActive();
+    }
+
+    function next() {
+      index += 1;
+      updateTransform(false);
+    }
+
+    function prev() {
+      index -= 1;
+      updateTransform(false);
+    }
+
+    // アニメーション終了後、クローンに居たら本物にジャンプ（見た目は同じ位置）
+    track.addEventListener("transitionend", () => {
+      if (index === 0) {
+        // 左端のクローン（lastClone）に居る → 本物の最後へ
+        index = realCount;
+        updateTransform(true);
+      } else if (index === totalSlides - 1) {
+        // 右端のクローン（firstClone）に居る → 本物の最初へ
+        index = 1;
+        updateTransform(true);
+      }
+      updateActive();
+    });
+
+    // カードクリック：クローンは無視し、実カードだけ対象
+    track.addEventListener("click", (e) => {
+      const card = e.target.closest(".case-card");
+      if (!card || card.classList.contains("case-card--clone")) return;
+
+      const realIdx = originalCards.indexOf(card);
+      if (realIdx === -1) return;
+
+      const currentLogical = getLogicalIndex();
+      if (realIdx === currentLogical) {
+        // 既に中央なら次へ
+        next();
+      } else {
+        goToRealIndex(realIdx);
+      }
+    });
+
+    prevBtn && prevBtn.addEventListener("click", prev);
+    nextBtn && nextBtn.addEventListener("click", next);
+
+    // リサイズ時に幅を再計算して位置を補正
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        calcSlideWidth();
+        updateTransform(true);
+      }, 120);
+    });
+
+    // 初期化
+    calcSlideWidth();
+    updateTransform(true); // index=1 (事例1) を中央へ
+    updateActive();
+  }
+
+  /* ============================================
+   Scroll Fade-up（下からふわっと表示）
+   ============================================ */
+
+// 要素に data-stagger が指定されていたら、子要素に自動で遅延を付与
+document.querySelectorAll("[data-stagger]").forEach(parent => {
+  Array.from(parent.children).forEach((child, i) => {
+    child.style.setProperty("--i", i);
+  });
+});
+
+// IntersectionObserver：画面下に入ったら発火
+const fadeObserver = new IntersectionObserver((entries, obs) => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    entry.target.classList.add("is-visible");
+    obs.unobserve(entry.target);
+  });
+}, {
+  root: null,
+  rootMargin: "0px 0px -15% 0px",
+  threshold: 0.06
+});
+
+// .fade-up を全部監視
+document.querySelectorAll(".fade-up").forEach(el => fadeObserver.observe(el));
+
+// 初回ロード時、すでに見えてる要素は即表示
+window.addEventListener("load", () => {
+  const vh = window.innerHeight;
+  document.querySelectorAll(".fade-up").forEach(el => {
+    const r = el.getBoundingClientRect();
+    if (r.top < vh * 0.92) {
+      el.classList.add("is-visible");
+    }
+  });
+});
